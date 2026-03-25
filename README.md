@@ -96,6 +96,22 @@ KeyForge is built using modern Android development tools.
 
 KeyForge is currently in **early development**.
 
+## Current Features
+
+- Add credentials
+- View saved credentials in a list
+- Local storage using Room database
+- MVVM architecture (ViewModel + Repository)
+- Jetpack Compose UI
+
+## In Progress
+
+- Edit credentials
+- Delete credentials
+- Credential detail screen
+- Improved navigation between screens
+- UI/UX refinements
+
 The initial goal is to complete a **minimum viable password manager** with strong encryption and secure local storage.
 
 ---
