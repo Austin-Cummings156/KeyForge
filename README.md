@@ -22,7 +22,7 @@ All stored credentials are encrypted locally, meaning the application does **not
 
 KeyForge focuses on three core principles:
 
-* **Security** – credentials are encrypted using modern cryptographic standards
+* **Security** – credentials are encrypted using modern cryptographic standards (currently in development)
 * **Local Ownership** – user data remains on the user's device
 * **Simplicity** – minimal interface focused on reliability and usability
 
@@ -98,21 +98,28 @@ KeyForge is currently in **early development**.
 
 ## Current Features
 
-- Add credentials
-- View saved credentials in a list
+- Add, edit, and delete credentials
+- View credentials in a structured list
+- Detailed credential view screen
+- Password visibility toggle (hide/reveal)
+- Notes support with scroll handling
+- Delete confirmation dialog
 - Local storage using Room database
 - MVVM architecture (ViewModel + Repository)
 - Jetpack Compose UI
+- Dark theme UI with consistent styling
+- Floating action button for adding credentials
+- In-app navigation between list, detail, and form screens
+- System back button handling aligned with app navigation
 
 ## In Progress
 
-- Edit credentials
-- Delete credentials
-- Credential detail screen
-- Improved navigation between screens
-- UI/UX refinements
+- Encryption layer (AES)
+- Argon2id key derivation
+- Master password setup and unlock flow
+- Vault lock/unlock state management
 
-The initial goal is to complete a **minimum viable password manager** with strong encryption and secure local storage.
+The current focus is transitioning KeyForge from a functional credential manager into a **secure password manager** by implementing proper encryption and authentication flows.
 
 ---
 
