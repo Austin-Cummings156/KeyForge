@@ -1,147 +1,115 @@
-# KeyForge
+# KeyForge 🔐
 
-**KeyForge** is an Android password manager designed around a simple idea:
-store credentials securely using modern cryptographic practices while keeping all sensitive data **locally encrypted on the user's device**.
+KeyForge is a local-first Android password manager focused on security, simplicity, and full user ownership.
 
-The goal of KeyForge is to provide a lightweight, transparent password manager that allows users to maintain strong, unique passwords without relying on external cloud services.
-
----
-
-# Overview
-
-Modern security advice encourages using unique, complex passwords for every service.
-However, remembering dozens of credentials is unrealistic for most people.
-
-KeyForge solves this by allowing users to securely store and manage credentials using a **single master password**.
-
-All stored credentials are encrypted locally, meaning the application does **not require external servers or cloud storage** to function.
+All data is stored encrypted on-device. No cloud sync, no external servers, no tracking.
 
 ---
 
-# Goals
+## 🚀 Overview
 
-KeyForge focuses on three core principles:
+Managing strong, unique passwords is difficult. KeyForge solves this by providing a secure vault protected by a single master password.
 
-* **Security** – credentials are encrypted using modern cryptographic standards (currently in development)
-* **Local Ownership** – user data remains on the user's device
-* **Simplicity** – minimal interface focused on reliability and usability
+Your data never leaves your device, and your master password is never stored.
 
 ---
 
-# MVP Features
+## 🔐 Security Model
 
-The first release of KeyForge will focus on core password manager functionality.
+KeyForge uses modern cryptographic practices to protect user data:
 
-### Vault System
+- **Master Password**
+    - Never stored or persisted
+    - Used only to derive an encryption key
 
-* Create encrypted credential vault
-* Unlock vault with master password
-* Secure vault key derivation
+- **Key Derivation**
+    - Argon2id with configurable parameters (memory, iterations, parallelism)
 
-### Credential Storage
+- **Encryption**
+    - AES-GCM for authenticated encryption
+    - Unique nonce per encrypted payload
 
-* Store usernames and passwords
-* Add notes to credentials
-* Edit and delete entries
-* Local encrypted database
+- **Vault Verification**
+    - Encrypted verifier blob confirms password correctness without storing the password
 
-### Security
+- **Data Storage**
+    - All credentials are encrypted at rest
+    - Database contains only ciphertext + metadata (no plaintext fields)
 
-* Argon2id key derivation
-* Encrypted credential storage
-* Recovery key generation
-
----
-
-# Planned Features
-
-These features are not part of the initial release but may be added later.
-
-### Security Improvements
-
-* Biometric unlock
-* Android Keystore integration
-* Auto-lock vault after inactivity
-* Clipboard clearing for copied passwords
-
-### Usability
-
-* Password generator
-* Credential search
-* Favorite credentials
-* UI improvements
-
-### Integration
-
-* Android Autofill support
-* Export encrypted backups
-* Import existing password databases
+- **In-Memory Security**
+    - Encryption key exists only while the vault is unlocked
+    - Key is cleared when the vault is locked or app is closed
 
 ---
 
-# Tech Stack
+## 📱 Features
 
-KeyForge is built using modern Android development tools.
+### Current (v1)
 
-* **Language:** Kotlin
-* **Platform:** Android
-* **Database:** Room
-* **Architecture:** MVVM
-* **Encryption:** Argon2id + AES encryption
-* **UI:** Jetpack Compose (or XML depending on final implementation)
-
----
-
-# Project Status
-
-KeyForge is currently in **early development**.
-
-## Current Features
-
-- Add, edit, and delete credentials
-- View credentials in a structured list
-- Detailed credential view screen
-- Password visibility toggle (hide/reveal)
-- Notes support with scroll handling
-- Delete confirmation dialog
-- Local storage using Room database
-- MVVM architecture (ViewModel + Repository)
-- Jetpack Compose UI
-- Dark theme UI with consistent styling
-- Floating action button for adding credentials
-- In-app navigation between list, detail, and form screens
-- System back button handling aligned with app navigation
-
-## In Progress
-
-- Encryption layer (AES)
-- Argon2id key derivation
-- Master password setup and unlock flow
-- Vault lock/unlock state management
-
-The current focus is transitioning KeyForge from a functional credential manager into a **secure password manager** by implementing proper encryption and authentication flows.
+- 🔐 Master password setup and login
+- 🧠 Argon2id-based key derivation
+- 🔒 Fully encrypted credential storage
+- 👁️ Password visibility toggle (secure UI handling)
+- 📋 Add, edit, delete credentials
+- 📂 Local-only storage (no cloud dependency)
+- 🎨 Consistent dark UI with custom branding
 
 ---
 
-# Why This Project Exists
+## 🧭 App Flow
 
-KeyForge was created as both a learning project and a practical tool.
-
-The project explores:
-
-* secure credential storage
-* cryptographic best practices
-* Android application architecture
-* user-focused security design
+1. First launch → Create vault (set master password)
+2. Vault created → credentials unlocked
+3. App restart → vault locked
+4. Enter password → unlock vault
+5. Access credentials securely
 
 ---
 
-# Disclaimer
+## 🏗️ Architecture
 
-KeyForge is an experimental project and should not yet be relied upon for storing critical credentials until the application has been thoroughly tested and audited.
+- **UI**: Jetpack Compose (Material3)
+- **State**: ViewModel + StateFlow
+- **Database**: Room
+- **Crypto Layer**:
+    - Argon2id (Bouncy Castle)
+    - AES-GCM encryption engine
+- **Separation of Concerns**:
+    - `VaultManager` → vault lifecycle + key handling
+    - `CredentialCrypto` → encryption/decryption
+    - `Repository` → data flow abstraction
 
 ---
 
-# License
+## ⚠️ Important Notes
 
-License information will be added once the project reaches a stable release.
+- There is currently **no password recovery**
+- If you forget your master password, your data is permanently inaccessible
+- This is intentional for security
+
+---
+
+## 🔮 Future Improvements
+
+- 🔒 Auto-lock and manual lock controls
+- 👆 Biometric unlock (fingerprint / face)
+- 📦 Backup & restore (secure export)
+- 🔍 Search optimization without exposing sensitive data
+- 🧩 Modular expansion (potential LifeOS integration)
+
+---
+
+## 🧑‍💻 Developer Notes
+
+KeyForge is actively under development and evolving toward a production-ready secure password manager.
+
+Security decisions prioritize:
+- No plaintext storage
+- No unnecessary exposure of secrets
+- Minimal attack surface
+
+---
+
+## 📜 License
+
+TBD
