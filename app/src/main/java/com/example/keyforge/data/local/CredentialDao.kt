@@ -1,29 +1,28 @@
 package com.example.keyforge.data.local
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.example.keyforge.data.model.Credential
+import com.example.keyforge.data.model.CredentialEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CredentialDao {
 
-    @Query("SELECT * FROM credentials ORDER BY siteName ASC")
-    fun getAllCredentials(): Flow<List<Credential>>
+    @Query("SELECT * FROM credentials ORDER BY updatedAt DESC")
+    fun getAllCredentials(): Flow<List<CredentialEntity>>
 
-    @Query("SELECT * FROM credentials WHERE id = :id")
-    suspend fun getCredentialById(id: Int): Credential?
+    @Query("SELECT * FROM credentials WHERE id = :id LIMIT 1")
+    suspend fun getCredentialById(id: Int): CredentialEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCredential(credential: Credential)
+    suspend fun insertCredential(credential: CredentialEntity)
 
     @Update
-    suspend fun updateCredential(credential: Credential)
+    suspend fun updateCredential(credential: CredentialEntity)
 
-    @Delete
-    suspend fun deleteCredential(credential: Credential)
+    @Query("DELETE FROM credentials WHERE id = :id")
+    suspend fun deleteCredentialById(id: Int)
 }

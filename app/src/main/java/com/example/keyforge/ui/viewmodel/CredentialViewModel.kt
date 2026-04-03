@@ -1,4 +1,4 @@
-package com.example.keyforge.ui
+package com.example.keyforge.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,11 +13,10 @@ class CredentialViewModel(
     private val repository: CredentialRepository
 ) : ViewModel() {
 
-    val credentials: StateFlow<List<Credential>> = repository
-        .getAllCredentials()
-        .stateIn(
+    val credentials: StateFlow<List<Credential>> =
+        repository.allCredentials.stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
+            started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
 
