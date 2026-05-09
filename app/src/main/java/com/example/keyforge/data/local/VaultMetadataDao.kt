@@ -8,6 +8,7 @@ import com.example.keyforge.data.model.VaultMetadata
 
 @Dao
 interface VaultMetadataDao {
+    // CRUD operations for vault metadata
 
     @Query("SELECT * FROM vault_metadata WHERE id = 1 LIMIT 1")
     suspend fun getVaultMetadata(): VaultMetadata?

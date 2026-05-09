@@ -5,5 +5,6 @@ sealed interface VaultUiState {
     data object SetupRequired : VaultUiState
     data object Locked : VaultUiState
     data object Unlocked : VaultUiState
+    data object RecoveryUnlocked : VaultUiState
     data class Error(val message: String) : VaultUiState
 }

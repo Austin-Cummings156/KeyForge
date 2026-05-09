@@ -4,8 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CredentialPayload(
-    val siteName: String,
-    val username: String,
-    val password: String,
-    val notes: String
+    val siteName: String, // Name of the website or application
+    val username: String, // Username associated with the credential
+    val password: String, // Password for the credential
+    val notes: String // Additional notes or comments about the credential
 )

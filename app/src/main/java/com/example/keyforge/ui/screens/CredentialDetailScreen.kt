@@ -56,26 +56,19 @@ fun CredentialDetailScreen(
         "•".repeat(credential.password.length.coerceAtLeast(8))
     }
 
-    val backgroundColor = Color(0xFF121212)
-    val cardColor = Color(0xFF1E1E1E)
-    val accentBlue = Color(0xFF3B82F6)
-    val textPrimary = Color.White
-    val textSecondary = Color(0xFFB3B3B3)
-    val destructiveRed = Color(0xFFDC2626)
-
     if (showDeleteConfirmation) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirmation = false },
             title = {
                 Text(
                     text = "Delete Credential?",
-                    color = textPrimary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             },
             text = {
                 Text(
                     text = "Are you sure you want to delete this credential? This action cannot be undone.",
-                    color = textSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             },
             confirmButton = {
@@ -85,8 +78,8 @@ fun CredentialDetailScreen(
                         onDeleteClick()
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = destructiveRed,
-                        contentColor = Color.White
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError
                     )
                 ) {
                     Text("Yes")
@@ -99,14 +92,14 @@ fun CredentialDetailScreen(
                     Text("No")
                 }
             },
-            containerColor = cardColor
+            containerColor = MaterialTheme.colorScheme.surface
         )
     }
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(backgroundColor)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp, vertical = 20.dp),
@@ -118,7 +111,7 @@ fun CredentialDetailScreen(
         ) {
             Text(
                 text = "Back",
-                color = accentBlue
+                color = MaterialTheme.colorScheme.primary
             )
         }
 
@@ -128,20 +121,20 @@ fun CredentialDetailScreen(
             Text(
                 text = credential.siteName,
                 style = MaterialTheme.typography.headlineMedium,
-                color = textPrimary
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             Text(
                 text = "Credential details",
                 style = MaterialTheme.typography.bodyMedium,
-                color = textSecondary
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
 
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
-                containerColor = cardColor
+                containerColor = MaterialTheme.colorScheme.surface
             )
         ) {
             Column(
@@ -151,8 +144,8 @@ fun CredentialDetailScreen(
                 DetailField(
                     label = "Username",
                     value = credential.username,
-                    labelColor = textSecondary,
-                    valueColor = textPrimary
+                    labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    valueColor = MaterialTheme.colorScheme.onSurface
                 )
 
                 Column(
@@ -161,7 +154,7 @@ fun CredentialDetailScreen(
                     Text(
                         text = "Password",
                         style = MaterialTheme.typography.labelLarge,
-                        color = textSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
                     Row(
@@ -172,7 +165,7 @@ fun CredentialDetailScreen(
                         Text(
                             text = displayedPassword,
                             style = MaterialTheme.typography.bodyLarge,
-                            color = textPrimary,
+                            color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.weight(1f)
                         )
 
@@ -187,7 +180,7 @@ fun CredentialDetailScreen(
                             } else {
                                 "Show password"
                             },
-                            tint = textSecondary,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier
                                 .padding(start = 8.dp)
                                 .size(24.dp)
@@ -199,8 +192,8 @@ fun CredentialDetailScreen(
                 ScrollableDetailField(
                     label = "Notes",
                     value = credential.notes.ifBlank { "No notes added." },
-                    labelColor = textSecondary,
-                    valueColor = textPrimary
+                    labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    valueColor = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
@@ -215,7 +208,7 @@ fun CredentialDetailScreen(
                 onClick = onEditClick,
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = textPrimary
+                    contentColor = MaterialTheme.colorScheme.onSurface
                 )
             ) {
                 Text("Edit")
@@ -225,8 +218,8 @@ fun CredentialDetailScreen(
                 onClick = { showDeleteConfirmation = true },
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = destructiveRed,
-                    contentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.error,
+                    contentColor = MaterialTheme.colorScheme.onError
                 )
             ) {
                 Text("Delete")
@@ -240,8 +233,8 @@ fun DetailField(
     label: String,
     value: String,
     modifier: Modifier = Modifier,
-    labelColor: Color = Color.Gray,
-    valueColor: Color = Color.White
+    labelColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    valueColor: Color = MaterialTheme.colorScheme.onSurface
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -265,8 +258,8 @@ fun ScrollableDetailField(
     label: String,
     value: String,
     modifier: Modifier = Modifier,
-    labelColor: Color = Color.Gray,
-    valueColor: Color = Color.White
+    labelColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    valueColor: Color = MaterialTheme.colorScheme.onSurface
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),

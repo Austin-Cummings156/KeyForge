@@ -9,10 +9,10 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class CredentialCrypto(
-    private val cryptoEngine: CryptoEngine,
-    private val vaultManager: VaultManager
+    private val cryptoEngine: CryptoEngine, // Handles AES encryption/decryption
+    private val vaultManager: VaultManager // Provides the active vault key
 ) {
-    private val json = Json
+    private val json = Json // Used for serialization
 
     fun encryptCredential(credential: Credential): CredentialEntity {
         val key = vaultManager.requireActiveVaultKey()
@@ -24,7 +24,10 @@ class CredentialCrypto(
             notes = credential.notes
         )
 
+        // Convert CredentialPayload to JSON and then JSON into ByteArray
         val jsonBytes = json.encodeToString(payload).toByteArray(Charsets.UTF_8)
+
+        // Encrypt JSON bytes using AES-GCM
         val encrypted = cryptoEngine.encrypt(jsonBytes, key)
 
         return CredentialEntity(
@@ -39,12 +42,14 @@ class CredentialCrypto(
     fun decryptCredential(entity: CredentialEntity): Credential {
         val key = vaultManager.requireActiveVaultKey()
 
+        // Decrypt the entity using AES-GCM to raw JSON bytes
         val decryptedBytes = cryptoEngine.decrypt(
             ciphertext = entity.encryptedData,
             key = key,
             nonce = entity.nonce
         )
 
+        // Convert JSON bytes to CredentialPayload
         val payload = json.decodeFromString<CredentialPayload>(
             String(decryptedBytes, Charsets.UTF_8)
         )

@@ -12,19 +12,14 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -34,12 +29,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.example.keyforge.data.model.Credential
+import com.example.keyforge.ui.components.KeyForgePasswordField
+import com.example.keyforge.ui.theme.keyForgeOutlinedTextFieldColors
 
 @Composable
 fun CredentialFormScreen(
@@ -52,7 +48,11 @@ fun CredentialFormScreen(
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
+    var localError by remember { mutableStateOf<String?>(null) }
+
+    val usernameFocusRequester = remember { FocusRequester() }
+    val passwordFocusRequester = remember { FocusRequester() }
+    val notesFocusRequester = remember { FocusRequester() }
 
     LaunchedEffect(existingCredential) {
         if (existingCredential != null) {
@@ -66,6 +66,7 @@ fun CredentialFormScreen(
             password = ""
             notes = ""
         }
+        localError = null
     }
 
     val isEditing = existingCredential != null
@@ -77,17 +78,45 @@ fun CredentialFormScreen(
     }
     val saveButtonText = if (isEditing) "Update Credential" else "Save Credential"
 
-    val backgroundColor = Color(0xFF121212)
-    val fieldBackgroundColor = Color(0xFF1E1E1E)
-    val accentBlue = Color(0xFF3B82F6)
-    val textPrimary = Color.White
-    val textSecondary = Color(0xFFB3B3B3)
-    val borderColor = Color(0xFF3A3A3A)
+    fun submit() {
+        localError = when {
+            siteName.isBlank() && username.isBlank() -> "Site name and username are required."
+            siteName.isBlank() -> "Site name is required."
+            username.isBlank() -> "Username is required."
+            password.isBlank() -> "Password is required."
+            else -> null
+        }
+
+        if (localError == null) {
+            val credential = existingCredential?.copy(
+                siteName = siteName,
+                username = username,
+                password = password,
+                notes = notes,
+                updatedAt = System.currentTimeMillis()
+            ) ?: Credential(
+                siteName = siteName,
+                username = username,
+                password = password,
+                notes = notes,
+                createdAt = System.currentTimeMillis()
+            )
+
+            onSave(credential)
+
+            if (!isEditing) {
+                siteName = ""
+                username = ""
+                password = ""
+                notes = ""
+            }
+        }
+    }
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(backgroundColor)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp, vertical = 20.dp),
@@ -99,7 +128,7 @@ fun CredentialFormScreen(
         ) {
             Text(
                 text = "Back",
-                color = accentBlue
+                color = MaterialTheme.colorScheme.primary
             )
         }
 
@@ -109,117 +138,98 @@ fun CredentialFormScreen(
             Text(
                 text = screenTitle,
                 style = MaterialTheme.typography.headlineMedium,
-                color = textPrimary
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodyMedium,
-                color = textSecondary
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        if (localError != null) {
+            Text(
+                text = localError!!,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.fillMaxWidth()
+            )
+        } else {
+            Spacer(modifier = Modifier.height(8.dp))
+        }
 
         OutlinedTextField(
             value = siteName,
-            onValueChange = { siteName = it },
+            onValueChange = {
+                siteName = it
+                localError = null
+            },
             label = { Text("Site Name") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = textPrimary,
-                unfocusedTextColor = textPrimary,
-                focusedLabelColor = accentBlue,
-                unfocusedLabelColor = textSecondary,
-                focusedBorderColor = accentBlue,
-                unfocusedBorderColor = borderColor,
-                cursorColor = accentBlue,
-                focusedContainerColor = fieldBackgroundColor,
-                unfocusedContainerColor = fieldBackgroundColor
+            colors = keyForgeOutlinedTextFieldColors(),
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = { usernameFocusRequester.requestFocus() }
             )
         )
 
         OutlinedTextField(
             value = username,
-            onValueChange = { username = it },
+            onValueChange = {
+                username = it
+                localError = null
+            },
             label = { Text("Username") },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = textPrimary,
-                unfocusedTextColor = textPrimary,
-                focusedLabelColor = accentBlue,
-                unfocusedLabelColor = textSecondary,
-                focusedBorderColor = accentBlue,
-                unfocusedBorderColor = borderColor,
-                cursorColor = accentBlue,
-                focusedContainerColor = fieldBackgroundColor,
-                unfocusedContainerColor = fieldBackgroundColor
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(usernameFocusRequester),
+            colors = keyForgeOutlinedTextFieldColors(),
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = { passwordFocusRequester.requestFocus() }
             )
         )
 
-        OutlinedTextField(
+        KeyForgePasswordField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = {
+                password = it
+                localError = null
+            },
             label = { Text("Password") },
-            singleLine = true,
-            visualTransformation = if (passwordVisible) {
-                VisualTransformation.None
-            } else {
-                PasswordVisualTransformation()
-            },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password
-            ),
-            trailingIcon = {
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(
-                        imageVector = if (passwordVisible) {
-                            Icons.Default.VisibilityOff
-                        } else {
-                            Icons.Default.Visibility
-                        },
-                        contentDescription = if (passwordVisible) {
-                            "Hide password"
-                        } else {
-                            "Show password"
-                        },
-                        tint = Color.LightGray
-                    )
-                }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = textPrimary,
-                unfocusedTextColor = textPrimary,
-                focusedLabelColor = accentBlue,
-                unfocusedLabelColor = textSecondary,
-                focusedBorderColor = accentBlue,
-                unfocusedBorderColor = borderColor,
-                cursorColor = accentBlue,
-                focusedContainerColor = fieldBackgroundColor,
-                unfocusedContainerColor = fieldBackgroundColor
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(passwordFocusRequester),
+            colors = keyForgeOutlinedTextFieldColors(),
+            imeAction = ImeAction.Next,
+            keyboardActions = KeyboardActions(
+                onNext = { notesFocusRequester.requestFocus() }
             )
         )
 
         OutlinedTextField(
             value = notes,
-            onValueChange = { notes = it },
+            onValueChange = {
+                notes = it
+                localError = null
+            },
             label = { Text("Notes") },
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 100.dp, max = 200.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = textPrimary,
-                unfocusedTextColor = textPrimary,
-                focusedLabelColor = accentBlue,
-                unfocusedLabelColor = textSecondary,
-                focusedBorderColor = accentBlue,
-                unfocusedBorderColor = borderColor,
-                cursorColor = accentBlue,
-                focusedContainerColor = fieldBackgroundColor,
-                unfocusedContainerColor = fieldBackgroundColor
+                .heightIn(min = 100.dp, max = 200.dp)
+                .focusRequester(notesFocusRequester),
+            colors = keyForgeOutlinedTextFieldColors(),
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = { submit() }
             )
         )
 
@@ -233,43 +243,18 @@ fun CredentialFormScreen(
                 onClick = onCancel,
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = textPrimary
+                    contentColor = MaterialTheme.colorScheme.onSurface
                 )
             ) {
                 Text("Cancel")
             }
 
             Button(
-                onClick = {
-                    if (siteName.isNotBlank() && username.isNotBlank()) {
-                        val credential = existingCredential?.copy(
-                            siteName = siteName,
-                            username = username,
-                            password = password,
-                            notes = notes,
-                            updatedAt = System.currentTimeMillis()
-                        ) ?: Credential(
-                            siteName = siteName,
-                            username = username,
-                            password = password,
-                            notes = notes,
-                            createdAt = System.currentTimeMillis()
-                        )
-
-                        onSave(credential)
-
-                        if (!isEditing) {
-                            siteName = ""
-                            username = ""
-                            password = ""
-                            notes = ""
-                        }
-                    }
-                },
+                onClick = { submit() },
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = accentBlue,
-                    contentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
                 Text(saveButtonText)

@@ -1,6 +1,5 @@
 package com.example.keyforge.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -26,12 +24,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.keyforge.R
 import com.example.keyforge.data.model.Credential
+import com.example.keyforge.ui.components.KeyForgeHeader
 
 @Composable
 fun CredentialListScreen(
@@ -43,21 +38,13 @@ fun CredentialListScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFF121212)) // dark background
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
     ) {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.keyforge_header),
-                contentDescription = "KeyForge Header",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp)
-                    .padding(top = 16.dp)
-            )
+            KeyForgeHeader()
 
             if (credentials.isEmpty()) {
                 Box(
@@ -66,7 +53,7 @@ fun CredentialListScreen(
                 ) {
                     Text(
                         text = "No credentials saved yet.",
-                        color = Color.Gray
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             } else {
@@ -92,8 +79,8 @@ fun CredentialListScreen(
                 .align(Alignment.BottomEnd)
                 .navigationBarsPadding()
                 .padding(20.dp),
-            containerColor = Color(0xFF3B82F6), // nice blue
-            contentColor = Color.White
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
@@ -114,7 +101,7 @@ fun CredentialItem(
             .fillMaxWidth()
             .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF1E1E1E)
+            containerColor = MaterialTheme.colorScheme.surface
         ),
         shape = MaterialTheme.shapes.medium
     ) {
@@ -124,12 +111,12 @@ fun CredentialItem(
             Text(
                 text = credential.siteName,
                 style = MaterialTheme.typography.titleMedium,
-                color = Color.White
+                color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = credential.username,
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.LightGray,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 4.dp)
             )
         }

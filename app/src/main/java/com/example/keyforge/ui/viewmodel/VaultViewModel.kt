@@ -20,6 +20,9 @@ class VaultViewModel(
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
+    private val _generatedRecoveryKey = MutableStateFlow<String?>(null)
+    val generatedRecoveryKey: StateFlow<String?> = _generatedRecoveryKey.asStateFlow()
+
     init {
         checkVaultStatus()
     }
@@ -47,7 +50,8 @@ class VaultViewModel(
             val passwordChars = masterPassword.toCharArray()
 
             val result = vaultManager.createVault(passwordChars)
-            result.onSuccess {
+            result.onSuccess { recoveryKey ->
+                _generatedRecoveryKey.value = recoveryKey
                 _vaultUiState.value = VaultUiState.Unlocked
             }.onFailure {
                 _errorMessage.value = it.message ?: "Failed to create vault."
@@ -69,8 +73,41 @@ class VaultViewModel(
         }
     }
 
+    fun unlockWithRecoveryKey(recoveryKey: String) {
+        viewModelScope.launch {
+            _errorMessage.value = null
+            val recoveryChars = recoveryKey.toCharArray()
+
+            val result = vaultManager.unlockWithRecoveryKey(recoveryChars)
+            result.onSuccess {
+                _vaultUiState.value = VaultUiState.RecoveryUnlocked
+            }.onFailure {
+                _errorMessage.value = it.message ?: "Failed to unlock with recovery key."
+            }
+        }
+    }
+
+    fun resetMasterPassword(newMasterPassword: String) {
+        viewModelScope.launch {
+            _errorMessage.value = null
+            val passwordChars = newMasterPassword.toCharArray()
+
+            val result = vaultManager.resetMasterPassword(passwordChars)
+            result.onSuccess {
+                _vaultUiState.value = VaultUiState.Unlocked
+            }.onFailure {
+                _errorMessage.value = it.message ?: "Failed to reset master password."
+            }
+        }
+    }
+
+    fun consumeGeneratedRecoveryKey() {
+        _generatedRecoveryKey.value = null
+    }
+
     fun lockVault() {
         vaultManager.lockVault()
+        _generatedRecoveryKey.value = null
         _vaultUiState.value = VaultUiState.Locked
     }
 
@@ -80,6 +117,7 @@ class VaultViewModel(
 
     override fun onCleared() {
         vaultManager.lockVault()
+        _generatedRecoveryKey.value = null
         super.onCleared()
     }
 }

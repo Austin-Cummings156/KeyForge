@@ -22,6 +22,8 @@ import com.example.keyforge.security.VaultManager
 import com.example.keyforge.ui.screens.CredentialDetailScreen
 import com.example.keyforge.ui.screens.CredentialFormScreen
 import com.example.keyforge.ui.screens.CredentialListScreen
+import com.example.keyforge.ui.screens.RecoveryKeyDisplayScreen
+import com.example.keyforge.ui.screens.RecoveryUnlockScreen
 import com.example.keyforge.ui.screens.VaultLoginScreen
 import com.example.keyforge.ui.screens.VaultSetupScreen
 import com.example.keyforge.ui.state.VaultUiState
@@ -62,14 +64,17 @@ class MainActivity : ComponentActivity() {
         setContent {
             val vaultState by vaultViewModel.vaultUiState.collectAsStateWithLifecycle()
             val errorMessage by vaultViewModel.errorMessage.collectAsStateWithLifecycle()
+            val generatedRecoveryKey by vaultViewModel.generatedRecoveryKey.collectAsStateWithLifecycle()
+
+            var showRecoveryUnlockScreen by remember { mutableStateOf(false) }
 
             KeyForgeTheme {
-                when (vaultState) {
-                    is VaultUiState.Loading -> {
+                when {
+                    vaultState is VaultUiState.Loading -> {
                         Text("Loading vault...")
                     }
 
-                    is VaultUiState.SetupRequired -> {
+                    vaultState is VaultUiState.SetupRequired -> {
                         VaultSetupScreen(
                             errorMessage = errorMessage,
                             onCreateVault = { password ->
@@ -78,20 +83,58 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    is VaultUiState.Locked -> {
-                        VaultLoginScreen(
-                            errorMessage = errorMessage,
-                            onUnlockVault = { password ->
-                                vaultViewModel.unlockVault(password)
+                    generatedRecoveryKey != null -> {
+                        RecoveryKeyDisplayScreen(
+                            recoveryKey = generatedRecoveryKey!!,
+                            onContinue = {
+                                vaultViewModel.consumeGeneratedRecoveryKey()
                             }
                         )
                     }
 
-                    is VaultUiState.Unlocked -> {
+                    vaultState is VaultUiState.Locked && showRecoveryUnlockScreen -> {
+                        RecoveryUnlockScreen(
+                            errorMessage = errorMessage,
+                            onUnlockWithRecoveryKey = { recoveryKey ->
+                                vaultViewModel.unlockWithRecoveryKey(recoveryKey)
+                            },
+                            onBackToLogin = {
+                                showRecoveryUnlockScreen = false
+                                vaultViewModel.clearError()
+                            }
+                        )
+                    }
+
+                    vaultState is VaultUiState.Locked -> {
+                        VaultLoginScreen(
+                            errorMessage = errorMessage,
+                            onUnlockVault = { password ->
+                                vaultViewModel.unlockVault(password)
+                            },
+                            onUseRecoveryKey = {
+                                showRecoveryUnlockScreen = true
+                                vaultViewModel.clearError()
+                            }
+                        )
+                    }
+
+                    vaultState is VaultUiState.RecoveryUnlocked -> {
+                        VaultSetupScreen(
+                            errorMessage = errorMessage,
+                            onCreateVault = { newPassword ->
+                                vaultViewModel.resetMasterPassword(newPassword)
+                            },
+                            title = "Reset Master Password",
+                            subtitle = "Create a new master password for your vault.",
+                            buttonText = "Reset Password"
+                        )
+                    }
+
+                    vaultState is VaultUiState.Unlocked -> {
                         KeyForgeApp(viewModel = viewModel)
                     }
 
-                    is VaultUiState.Error -> {
+                    vaultState is VaultUiState.Error -> {
                         Text("Error loading vault")
                     }
                 }

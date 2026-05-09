@@ -9,8 +9,8 @@ import com.example.keyforge.data.model.VaultMetadata
 
 @Database(
     entities = [CredentialEntity::class, VaultMetadata::class],
-    version = 3,
-    exportSchema = false
+    version = 4, // Incremented when database schema changes
+    exportSchema = false // Set to true for future compatibility
 )
 abstract class KeyForgeDatabase : RoomDatabase() {
 
@@ -28,7 +28,7 @@ abstract class KeyForgeDatabase : RoomDatabase() {
                     KeyForgeDatabase::class.java,
                     "keyforge_database"
                 )
-                    .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigration(false)
                     .build()
 
                 INSTANCE = instance

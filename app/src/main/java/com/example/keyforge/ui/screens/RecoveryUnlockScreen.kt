@@ -3,11 +3,12 @@ package com.example.keyforge.ui.screens
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,27 +18,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import com.example.keyforge.ui.components.KeyForgePasswordField
 import com.example.keyforge.ui.theme.keyForgeOutlinedTextFieldColors
 
 @Composable
-fun VaultLoginScreen(
+fun RecoveryUnlockScreen(
     errorMessage: String?,
-    onUnlockVault: (String) -> Unit,
-    onUseRecoveryKey: () -> Unit
+    onUnlockWithRecoveryKey: (String) -> Unit,
+    onBackToLogin: () -> Unit
 ) {
-    var password by rememberSaveable { mutableStateOf("") }
+    var recoveryKey by rememberSaveable { mutableStateOf("") }
     var localError by rememberSaveable { mutableStateOf<String?>(null) }
 
     fun submit() {
-        localError = if (password.isBlank()) {
-            "Enter your master password."
+        localError = if (recoveryKey.isBlank()) {
+            "Enter your recovery key."
         } else {
             null
         }
 
         if (localError == null) {
-            onUnlockVault(password)
+            onUnlockWithRecoveryKey(recoveryKey)
         }
     }
 
@@ -48,8 +48,8 @@ fun VaultLoginScreen(
     }
 
     VaultAuthLayout(
-        title = "Unlock KeyForge",
-        subtitle = "Enter your master password to unlock your vault."
+        title = "Recover Your Vault",
+        subtitle = "Enter your recovery key to regain access and set a new master password."
     ) {
         val displayedError = localError ?: errorMessage
         if (displayedError != null) {
@@ -62,16 +62,19 @@ fun VaultLoginScreen(
             )
         }
 
-        KeyForgePasswordField(
-            value = password,
+        OutlinedTextField(
+            value = recoveryKey,
             onValueChange = {
-                password = it
+                recoveryKey = it.uppercase()
                 localError = null
             },
-            label = { Text("Master Password") },
+            label = { Text("Recovery Key") },
+            singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             colors = keyForgeOutlinedTextFieldColors(),
-            imeAction = ImeAction.Done,
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Done
+            ),
             keyboardActions = KeyboardActions(
                 onDone = { submit() }
             )
@@ -87,14 +90,20 @@ fun VaultLoginScreen(
                 contentColor = MaterialTheme.colorScheme.onPrimary
             )
         ) {
-            Text("Unlock Vault")
+            Text("Recover Vault")
         }
 
-        TextButton(
-            onClick = onUseRecoveryKey,
-            modifier = Modifier.padding(top = 8.dp)
+        Button(
+            onClick = onBackToLogin,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface
+            )
         ) {
-            Text("Use Recovery Key")
+            Text("Back to Login")
         }
     }
 }
