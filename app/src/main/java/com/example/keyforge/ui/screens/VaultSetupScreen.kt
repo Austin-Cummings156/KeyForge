@@ -22,6 +22,12 @@ import androidx.compose.ui.unit.dp
 import com.example.keyforge.ui.components.KeyForgePasswordField
 import com.example.keyforge.ui.theme.keyForgeOutlinedTextFieldColors
 
+/**
+ * Screen used for both first-time vault creation and master password reset.
+ *
+ * The displayed title, subtitle, and button text can be customized so the same
+ * form supports setup and recovery-driven password reset.
+ */
 @Composable
 fun VaultSetupScreen(
     errorMessage: String?,

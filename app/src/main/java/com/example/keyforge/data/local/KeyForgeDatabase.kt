@@ -7,16 +7,28 @@ import androidx.room.RoomDatabase
 import com.example.keyforge.data.model.CredentialEntity
 import com.example.keyforge.data.model.VaultMetadata
 
+/**
+ * Local Room database for KeyForge.
+ *
+ * The database stores encrypted credentials and vault metadata only. Plaintext
+ * credential contents and master passwords should never be persisted here.
+ */
 @Database(
     entities = [CredentialEntity::class, VaultMetadata::class],
-    version = 4, // Incremented when database schema changes
-    exportSchema = false // Set to true for future compatibility
+    version = 4,
+    exportSchema = false
 )
 abstract class KeyForgeDatabase : RoomDatabase() {
 
     abstract fun credentialDao(): CredentialDao
     abstract fun vaultMetadataDao(): VaultMetadataDao
 
+    /**
+     * Provides a process-wide singleton database instance.
+     *
+     * Room database creation is synchronized to prevent multiple instances from
+     * being created at the same time.
+     */
     companion object {
         @Volatile
         private var INSTANCE: KeyForgeDatabase? = null
@@ -28,7 +40,6 @@ abstract class KeyForgeDatabase : RoomDatabase() {
                     KeyForgeDatabase::class.java,
                     "keyforge_database"
                 )
-                    .fallbackToDestructiveMigration(false)
                     .build()
 
                 INSTANCE = instance

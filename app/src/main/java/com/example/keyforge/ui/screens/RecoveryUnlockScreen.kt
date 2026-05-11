@@ -20,6 +20,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.example.keyforge.ui.theme.keyForgeOutlinedTextFieldColors
 
+/**
+ * Recovery-key unlock screen.
+ *
+ * A valid recovery key unlocks the vault key and sends the user into the master
+ * password reset flow instead of directly replacing stored credentials.
+ */
 @Composable
 fun RecoveryUnlockScreen(
     errorMessage: String?,

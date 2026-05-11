@@ -28,6 +28,12 @@ import androidx.compose.ui.unit.dp
 import com.example.keyforge.data.model.Credential
 import com.example.keyforge.ui.components.KeyForgeHeader
 
+/**
+ * Displays the unlocked vault's credential list.
+ *
+ * The credentials passed into this screen have already been decrypted by the
+ * repository layer.
+ */
 @Composable
 fun CredentialListScreen(
     credentials: List<Credential>,

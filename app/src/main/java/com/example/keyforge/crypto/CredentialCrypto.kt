@@ -8,11 +8,27 @@ import com.example.keyforge.security.VaultManager
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
+/**
+ * Converts between plaintext credential models and encrypted database entities.
+ *
+ * The UI and ViewModel work with [Credential], while Room stores only
+ * [CredentialEntity] values containing ciphertext and nonce data. This class is
+ * the boundary where credential fields are serialized, encrypted, decrypted,
+ * and deserialized.
+ */
+
 class CredentialCrypto(
-    private val cryptoEngine: CryptoEngine, // Handles AES encryption/decryption
-    private val vaultManager: VaultManager // Provides the active vault key
+    private val cryptoEngine: CryptoEngine,
+    private val vaultManager: VaultManager
 ) {
-    private val json = Json // Used for serialization
+    private val json = Json
+
+    /**
+     * Serializes and encrypts a credential for database storage.
+     *
+     * Site name, username, password, and notes are packed into [CredentialPayload]
+     * before encryption so Room never stores those fields as plaintext columns.
+     */
 
     fun encryptCredential(credential: Credential): CredentialEntity {
         val key = vaultManager.requireActiveVaultKey()
@@ -24,10 +40,8 @@ class CredentialCrypto(
             notes = credential.notes
         )
 
-        // Convert CredentialPayload to JSON and then JSON into ByteArray
         val jsonBytes = json.encodeToString(payload).toByteArray(Charsets.UTF_8)
 
-        // Encrypt JSON bytes using AES-GCM
         val encrypted = cryptoEngine.encrypt(jsonBytes, key)
 
         return CredentialEntity(
@@ -39,17 +53,22 @@ class CredentialCrypto(
         )
     }
 
+    /**
+     * Decrypts a stored credential entity back into the app's plaintext model.
+     *
+     * This requires the vault to be unlocked because the active vault key is needed
+     * to decrypt the encrypted payload.
+     */
+
     fun decryptCredential(entity: CredentialEntity): Credential {
         val key = vaultManager.requireActiveVaultKey()
 
-        // Decrypt the entity using AES-GCM to raw JSON bytes
         val decryptedBytes = cryptoEngine.decrypt(
             ciphertext = entity.encryptedData,
             key = key,
             nonce = entity.nonce
         )
 
-        // Convert JSON bytes to CredentialPayload
         val payload = json.decodeFromString<CredentialPayload>(
             String(decryptedBytes, Charsets.UTF_8)
         )

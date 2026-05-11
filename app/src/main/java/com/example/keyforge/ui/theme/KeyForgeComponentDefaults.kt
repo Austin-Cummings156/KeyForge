@@ -5,6 +5,12 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 
+/**
+ * Shared component styling defaults for KeyForge.
+ *
+ * Centralizing these values keeps buttons, text fields, and other reusable UI
+ * pieces visually consistent across screens.
+ */
 @Composable
 fun keyForgeOutlinedTextFieldColors(): TextFieldColors {
     return OutlinedTextFieldDefaults.colors(

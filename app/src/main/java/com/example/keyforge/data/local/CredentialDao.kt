@@ -8,6 +8,12 @@ import androidx.room.Update
 import com.example.keyforge.data.model.CredentialEntity
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * Room DAO for encrypted credential records.
+ *
+ * All sensitive credential fields are stored inside [CredentialEntity.encryptedData].
+ * The DAO never reads or writes plaintext site names, usernames, passwords, or notes.
+ */
 @Dao
 interface CredentialDao {
 

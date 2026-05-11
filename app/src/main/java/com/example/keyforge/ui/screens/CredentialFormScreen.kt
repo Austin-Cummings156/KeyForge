@@ -37,6 +37,12 @@ import com.example.keyforge.data.model.Credential
 import com.example.keyforge.ui.components.KeyForgePasswordField
 import com.example.keyforge.ui.theme.keyForgeOutlinedTextFieldColors
 
+/**
+ * Add/edit form for credentials.
+ *
+ * The same form supports creating new credentials and updating existing ones.
+ * Encryption happens after save in the repository layer, not inside the UI.
+ */
 @Composable
 fun CredentialFormScreen(
     onSave: (Credential) -> Unit,

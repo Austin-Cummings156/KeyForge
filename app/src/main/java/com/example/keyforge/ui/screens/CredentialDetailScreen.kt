@@ -39,6 +39,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.keyforge.data.model.Credential
 
+/**
+ * Shows one decrypted credential after the user selects it from the vault list.
+ *
+ * Password visibility should remain user-controlled so sensitive values are not
+ * shown by default.
+ */
 @Composable
 fun CredentialDetailScreen(
     credential: Credential,

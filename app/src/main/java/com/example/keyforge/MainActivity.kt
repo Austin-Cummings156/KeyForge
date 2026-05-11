@@ -33,6 +33,17 @@ import com.example.keyforge.ui.viewmodel.CredentialViewModelFactory
 import com.example.keyforge.ui.viewmodel.VaultViewModel
 import com.example.keyforge.ui.viewmodel.VaultViewModelFactory
 
+/**
+ * Main entry point for KeyForge.
+ *
+ * This activity wires together the local database, repositories, crypto helpers,
+ * vault manager, and ViewModels, then selects the correct Compose screen based
+ * on the current vault state.
+ *
+ * KeyForge intentionally keeps its navigation simple for v1. The activity acts
+ * as the top-level coordinator between vault authentication states and the
+ * credential management screens.
+ */
 class MainActivity : ComponentActivity() {
 
     private lateinit var viewModel: CredentialViewModel
@@ -143,6 +154,13 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/**
+ * Displays the unlocked credential vault experience.
+ *
+ * This composable owns the simple v1 screen flow for listing credentials,
+ * viewing credential details, and opening the add/edit form. Sensitive data
+ * should only reach this flow after the vault has been unlocked.
+ */
 @Composable
 fun KeyForgeApp(
     viewModel: CredentialViewModel
@@ -165,7 +183,7 @@ fun KeyForgeApp(
                         editingCredential = null
                         selectedCredential = null
                     } else {
-                        viewModel.insertCredential(it)
+                        viewModel.addCredential(it)
                     }
                     showFormScreen = false
                 },

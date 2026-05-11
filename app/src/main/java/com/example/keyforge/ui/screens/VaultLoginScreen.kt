@@ -20,6 +20,12 @@ import androidx.compose.ui.unit.dp
 import com.example.keyforge.ui.components.KeyForgePasswordField
 import com.example.keyforge.ui.theme.keyForgeOutlinedTextFieldColors
 
+/**
+ * Login screen for unlocking an existing vault with the master password.
+ *
+ * Also exposes the recovery-key path when the user cannot unlock with their
+ * master password.
+ */
 @Composable
 fun VaultLoginScreen(
     errorMessage: String?,

@@ -25,6 +25,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.keyforge.ui.components.KeyForgeHeader
 
+/**
+ * One-time recovery key display screen shown after vault creation.
+ *
+ * The recovery key is not stored in plaintext, so the user must save it before
+ * continuing.
+ */
 @Composable
 fun RecoveryKeyDisplayScreen(
     recoveryKey: String,

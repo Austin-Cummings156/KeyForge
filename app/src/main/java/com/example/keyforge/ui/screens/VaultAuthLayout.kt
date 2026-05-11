@@ -24,6 +24,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.keyforge.ui.components.KeyForgeHeader
 
+/**
+ * Shared layout wrapper for vault authentication screens.
+ *
+ * Provides consistent spacing, branding, and dark theme structure for setup,
+ * login, recovery unlock, and password reset flows.
+ */
 @Composable
 fun VaultAuthLayout(
     title: String,

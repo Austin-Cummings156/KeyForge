@@ -3,6 +3,14 @@ package com.example.keyforge.data.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+/**
+ * Single-row metadata record required to unlock the vault.
+ *
+ * This stores salts, Argon2 parameters, and encrypted copies of the vault key.
+ * The vault key is wrapped once by the master-password-derived key and once by
+ * the recovery-key-derived key. Neither the master password nor recovery key is
+ * stored.
+ */
 @Entity(tableName = "vault_metadata")
 data class VaultMetadata(
     @PrimaryKey
@@ -22,6 +30,12 @@ data class VaultMetadata(
 
     val createdAt: Long = System.currentTimeMillis()
 ) {
+    /**
+     * Provides content-based equality for ByteArray fields.
+     *
+     * Kotlin arrays compare by reference by default, which is not useful for Room
+     * entities containing cryptographic byte arrays.
+     */
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -42,7 +56,9 @@ data class VaultMetadata(
 
         return true
     }
-
+    /**
+     * Hashes ByteArray contents so hashCode stays consistent with [equals].
+     */
     override fun hashCode(): Int {
         var result = id
         result = 31 * result + argon2MemoryCostKb

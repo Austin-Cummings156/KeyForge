@@ -21,6 +21,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 
+/**
+ * Shared password input field with visibility toggle behavior.
+ *
+ * Used by setup, login, recovery, and reset-password screens so sensitive input
+ * styling and behavior remain consistent across the app.
+ */
 @Composable
 fun KeyForgePasswordField(
     value: String,
